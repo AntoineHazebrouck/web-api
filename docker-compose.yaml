@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+    mongo:
+        ports: ['27017:27017']
+        container_name: mongo-dev
+        restart: on-failure
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=user
+            - MONGO_INITDB_ROOT_PASSWORD=password
+        image: mongo
+    # api-web:
+    #     build: .
+    #     container_name: api-web
+    #     ports: ['8080:8080']
