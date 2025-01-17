@@ -6,6 +6,8 @@ import fr.imt.authentication.entities.User;
 
 public interface UserRepository {
 	Optional<User> findByToken(String token);
-	Optional<User> findByLoginAndPassword(String login, String password);
+
+	Optional<User> findByLogin(String login);
+
 	User save(User user);
 }

@@ -15,10 +15,9 @@ public class LocalUserRepository implements UserRepository {
 	private final Set<User> users = new HashSet<>();
 
 	@Override
-	public Optional<User> findByLoginAndPassword(String login, String password) {
+	public Optional<User> findByLogin(String login) {
 		return users.stream()
 				.filter(user -> user.getLogin().equals(login))
-				.filter(user -> user.getPassword().equals(password))
 				.findFirst();
 	}
 

@@ -11,5 +11,5 @@ import fr.imt.authentication.entities.User;
 interface DatabaseUserRepository extends UserRepository, MongoRepository<User, String> {
 
 	@Override
-	Optional<User> findByLoginAndPassword(String login, String password);
+	Optional<User> findByLogin(String login);
 }
