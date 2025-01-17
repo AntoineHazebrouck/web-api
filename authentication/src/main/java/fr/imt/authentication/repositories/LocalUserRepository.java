@@ -34,10 +34,4 @@ public class LocalUserRepository implements UserRepository {
 				.filter(user -> user.getToken().equals(token))
 				.findFirst();
 	}
-
-	@Override
-	public void deleteByLogin(String login) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'deleteByLogin'");
-	}
 }
