@@ -33,7 +33,7 @@ class SecurityController {
 		return userRepository.findByLogin(login)
 				.filter(user -> passwordEncoder.matches(password, user.getPassword()))
 				.map(user -> {
-					user.setToken(generateEncryptedToken());
+					user.setToken(generateEncryptedToken(login, LocalDateTime.now()));
 					user.setExpiration(LocalDateTime.now().plusHours(1));
 					return user;
 				})
@@ -72,7 +72,7 @@ class SecurityController {
 				.orElse(ResponseEntity.status(401).build());
 	}
 
-	private String generateEncryptedToken() {
-		return passwordEncoder.encode("TODO");
+	private String generateEncryptedToken(String login, LocalDateTime time) {
+		return passwordEncoder.encode("%s-%s".formatted(login, time));
 	}
 }
