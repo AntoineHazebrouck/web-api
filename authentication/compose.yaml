@@ -1,3 +1,4 @@
+# This compose is to test between authentication-api and mongo only
 version: '3.3'
 services:
     mongo-database:
@@ -5,12 +6,10 @@ services:
         container_name: mongo-database
         restart: on-failure
         environment:
-            - MONGO_INITDB_DATABASE=authentication
             - MONGO_INITDB_ROOT_USERNAME=user
             - MONGO_INITDB_ROOT_PASSWORD=password
         image: mongo
     authentication-api:
-        build: .
+        build: ./authentication
         container_name: authentication-api
         ports: ['8080:8080']
-
