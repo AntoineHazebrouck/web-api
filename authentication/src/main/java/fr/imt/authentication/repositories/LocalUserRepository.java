@@ -11,7 +11,7 @@ import fr.imt.authentication.entities.User;
 
 @Repository
 @Profile("local")
-public class LocalUserRepository implements UserRepository {
+class LocalUserRepository implements UserRepository {
 	private final Set<User> users = new HashSet<>();
 
 	@Override
