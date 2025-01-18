@@ -1,4 +1,4 @@
-package fr.imt.entity;
+package fr.imt.authentication.entities;
 
 import java.time.LocalDateTime;
 

@@ -1,1 +1,10 @@
-spring.application.name: authentication
+spring:
+    application.name: authentication
+    data:
+        mongodb:
+            host: mongo-database
+            port: 27017
+            username: user
+            password: password
+            authentication-database: admin
+            database: demodb

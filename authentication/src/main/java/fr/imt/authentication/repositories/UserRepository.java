@@ -1,11 +1,13 @@
-package fr.imt.repository;
+package fr.imt.authentication.repositories;
 
 import java.util.Optional;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import fr.imt.authentication.entities.User;
 
-import fr.imt.entity.User;
+public interface UserRepository {
+	Optional<User> findByToken(String token);
 
-public interface UserRepository extends MongoRepository<User, String> {
-	Optional<User> findByLoginAndPassword(String login, String password);
+	Optional<User> findByLogin(String login);
+
+	User save(User user);
 }
