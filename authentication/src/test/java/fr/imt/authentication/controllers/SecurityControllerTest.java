@@ -53,6 +53,27 @@ class SecurityControllerTest {
 	}
 
 	@Test
+	void login_sends_bad_request_if_authorization_is_not_basic() {
+		HttpHeaders wrongAuthorization = new HttpHeaders();
+		wrongAuthorization.setBearerAuth("wrong");
+		assertThat(post("/login", wrongAuthorization).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	void register_sends_bad_request_if_authorization_is_not_basic() {
+		HttpHeaders wrongAuthorization = new HttpHeaders();
+		wrongAuthorization.setBearerAuth("wrong");
+		assertThat(post("/register", wrongAuthorization).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
+	void check_token_sends_bad_request_if_authorization_is_not_bearer() {
+		HttpHeaders wrongAuthorization = new HttpHeaders();
+		wrongAuthorization.setBasicAuth("wrong", "wrong");
+		assertThat(post("/check-token", wrongAuthorization).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+	}
+
+	@Test
 	void check_token_sends_unauthorized_if_token_is_wrong() {
 		post("/register", login, password);
 		post("/login", login, password);
