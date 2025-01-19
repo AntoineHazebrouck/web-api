@@ -1,5 +1,5 @@
 spring:
-    application.name: authentication
+    application.name: players
     data:
         mongodb:
             host: mongo-database
@@ -7,4 +7,4 @@ spring:
             username: user
             password: password
             authentication-database: admin
-            database: authentication-database
+            database: players-database

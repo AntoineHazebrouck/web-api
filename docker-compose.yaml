@@ -13,3 +13,9 @@ services:
         container_name: authentication-api
         ports: ['8080:8080']
         depends_on: ['mongo-database']
+
+    players-api:
+        build: ./players
+        container_name: players-api
+        ports: ['9090:8080']
+        depends_on: ['mongo-database', 'authentication-api']
