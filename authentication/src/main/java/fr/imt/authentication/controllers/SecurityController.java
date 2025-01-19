@@ -44,7 +44,10 @@ class SecurityController {
 	}
 
 	@PostMapping("/register")
-	public String register(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+	public ResponseEntity<String> register(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+		if (!authorizationHeaderService.isBasic(authorization))
+			return ResponseEntity.badRequest().build();
+
 		User user = new User();
 		user.setLogin(authorizationHeaderService
 				.retrieveCredentials(authorization)
@@ -52,7 +55,7 @@ class SecurityController {
 		user.setPassword(passwordEncoder.encode(authorizationHeaderService
 				.retrieveCredentials(authorization)
 				.getSecond()));
-		return userRepository.save(user).getLogin();
+		return ResponseEntity.ok(userRepository.save(user).getLogin());
 	}
 
 	@PostMapping("/check-token")
