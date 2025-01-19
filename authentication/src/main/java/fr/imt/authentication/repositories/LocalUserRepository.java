@@ -33,4 +33,9 @@ class LocalUserRepository implements UserRepository {
 				.filter(user -> user.getToken().equals(token))
 				.findFirst();
 	}
+
+	@Override
+	public void deleteAll() {
+		users.clear();
+	}
 }

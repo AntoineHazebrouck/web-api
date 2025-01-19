@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -20,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 class SecurityController {
 	private final UserRepository userRepository;
 	private final AuthorizationHeaderService authorizationHeaderService;
-	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	private final PasswordEncoder passwordEncoder;
 
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
@@ -70,6 +69,7 @@ class SecurityController {
 					user.setExpiration(LocalDateTime.now().plusHours(1));
 					return user;
 				})
+				.map(userRepository::save)
 				.map(User::getLogin)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.status(401).build());

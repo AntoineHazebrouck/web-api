@@ -10,4 +10,6 @@ public interface UserRepository {
 	Optional<User> findByLogin(String login);
 
 	User save(User user);
+
+	void deleteAll();
 }
