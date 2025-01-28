@@ -1,14 +1,28 @@
 version: '3.3'
 services:
-    mongo:
+    mongo-database:
         ports: ['27017:27017']
-        container_name: mongo-dev
+        container_name: mongo-database
         restart: on-failure
         environment:
             - MONGO_INITDB_ROOT_USERNAME=user
             - MONGO_INITDB_ROOT_PASSWORD=password
         image: mongo
-    # api-web:
-    #     build: .
-    #     container_name: api-web
-    #     ports: ['8080:8080']
+
+    authentication-api:
+        build: ./authentication
+        container_name: authentication-api
+        ports: [ '8080:8080' ]
+        depends_on: [ 'mongo-database' ]
+
+    players-api:
+        build: ./players
+        container_name: players-api
+        ports: [ '9090:8080' ]
+        depends_on: [ 'mongo-database', 'authentication-api' ]
+
+    invocations-api:
+        build: ./invocations
+        container_name: invocations-api
+        ports: [ '7070:8080' ]
+        depends_on: [ 'mongo-database', 'authentication-api' ]
