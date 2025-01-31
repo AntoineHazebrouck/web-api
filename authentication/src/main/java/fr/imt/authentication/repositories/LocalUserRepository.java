@@ -38,4 +38,9 @@ class LocalUserRepository implements UserRepository {
 	public void deleteAll() {
 		users.clear();
 	}
+
+	@Override
+	public void deleteById(String login) {
+		users.removeIf(user -> user.getLogin().equals(login));
+	}
 }
