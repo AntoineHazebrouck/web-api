@@ -37,8 +37,8 @@ public class UserService {
 	public Optional<User> postponeTokenExpiration(String token) {
 
 		return userRepository
-				.findByToken(token)
-				.filter(user -> user.getExpiration().isAfter(LocalDateTime.now()))
+				.findByTokenAndExpirationAfter(token, LocalDateTime.now())
+				// .filter(user -> user.getExpiration().isAfter(LocalDateTime.now()))
 				.map(UserService::postponeExpiration)
 				.map(userRepository::save);
 	}

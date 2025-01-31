@@ -2,10 +2,13 @@ package fr.imt.authentication.features;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.ResponseEntity;
 
 import fr.imt.authentication.controllers.CommonControllerTest;
 import fr.imt.authentication.dtos.user.UserDto;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -13,6 +16,11 @@ import io.cucumber.java.en.When;
 public class CommonSteps extends CommonControllerTest {
 	UserDto user = new UserDto();
 	ResponseEntity<String> response;
+
+	@Before
+	void clear() {
+		userRepository.deleteAll();
+	}
 
 	@When("the client calls POST {string}")
 	public void the_client_calls_post(String endpoint) {
@@ -48,13 +56,16 @@ public class CommonSteps extends CommonControllerTest {
 
 	@Then("the client receives a valid token")
 	public void the_client_receives_a_valid_token() {
-		// Write code here that turns the phrase above into concrete actions
-		throw new io.cucumber.java.PendingException();
+		String token = response.getBody();
+		assertThat(userRepository.findByTokenAndExpirationAfter(token, LocalDateTime.now())).isPresent();
 	}
 
 	@Then("the token expires after an hour")
 	public void the_token_expires_after_an_hour() {
-		// Write code here that turns the phrase above into concrete actions
-		throw new io.cucumber.java.PendingException();
+		String token = response.getBody();
+		assertThat(userRepository.findByTokenAndExpirationAfter(token, LocalDateTime.now()).get().getExpiration())
+				.isBetween(
+						LocalDateTime.now().plusHours(1).minusMinutes(2),
+						LocalDateTime.now().plusHours(1).plusMinutes(2));
 	}
 }
