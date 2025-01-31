@@ -1,12 +1,14 @@
-package fr.imt.authentication.controllers;
+package fr.imt.authentication.features;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.assertj.core.api.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fr.imt.authentication.repositories.UserRepository;
@@ -23,11 +25,16 @@ public class CommonControllerTest {
 	private int port;
 
 	protected final URI url(String path) {
+		return url(path, Map.of());
+	}
+
+	protected final URI url(String path, Map<String, String> params) {
 		return UriComponentsBuilder.newInstance()
 				.scheme("http")
 				.host("localhost")
 				.port(port)
 				.path(path)
+				.queryParams(MultiValueMap.fromSingleValue(params))
 				.build().toUri();
 	}
 

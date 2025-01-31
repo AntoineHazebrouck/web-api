@@ -3,10 +3,10 @@ package fr.imt.authentication.features;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
-import fr.imt.authentication.controllers.CommonControllerTest;
 import fr.imt.authentication.dtos.user.UserDto;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -25,6 +25,14 @@ public class CommonSteps extends CommonControllerTest {
 	@When("the client calls POST {string}")
 	public void the_client_calls_post(String endpoint) {
 		response = restTemplate.postForEntity(url(endpoint), user, String.class);
+	}
+
+	@When("the client calls POST {string} with token")
+	public void the_client_calls_POST_with_token(String endpoint) {
+		response = restTemplate.postForEntity(
+				url(endpoint, Map.of("token", response.getBody())),
+				endpoint,
+				String.class);
 	}
 
 	@Given("the login is {string}")
@@ -68,4 +76,21 @@ public class CommonSteps extends CommonControllerTest {
 						LocalDateTime.now().plusHours(1).minusMinutes(2),
 						LocalDateTime.now().plusHours(1).plusMinutes(2));
 	}
+
+	@Given("the token is {string}")
+	public void the_token_is(String token) {
+		response = ResponseEntity.status(response.getStatusCode()).body(token);
+	}
+
+	@Given("an hour has passed")
+	public void an_hour_has_passed() {
+		// virtually go one hour in the future by moving the expiration back one hour
+		userRepository.findByTokenAndExpirationAfter(response.getBody(), LocalDateTime.now())
+				.map(user -> {
+					user.setExpiration(user.getExpiration().minusHours(1));
+					return user;
+				})
+				.ifPresent(userRepository::save);
+	}
+
 }
