@@ -11,5 +11,5 @@ import io.cucumber.junit.CucumberOptions;
 }, extraGlue = {
 		"fr.imt.authentication.features"
 })
-class CucumberTestsLauncher {
+public class CucumberRunnerTest {
 }
