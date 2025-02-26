@@ -1,14 +1,19 @@
-document.querySelector('#register-submit').addEventListener("click", (event) => {
+const urls = {
+	authentication: 'http://localhost:8080',
+	invocations: 'http://localhost:7070',
+}
+
+const authenticationAction = (event, endpoint) => {
 	event.preventDefault();
 
-	const login = document.querySelector('#register-login').value
-	const password = document.querySelector('#register-password').value
+	const login = document.querySelector('#form-login').value
+	const password = document.querySelector('#form-password').value
 
 	console.log(JSON.stringify({
 		password, login
 	}));
 
-	fetch("http://authentication-api:8080/register", {
+	fetch(`${urls.authentication}/${endpoint}`, {
 		method: "POST",
 		headers: {
 			"Content-type": "application/json"
@@ -16,5 +21,9 @@ document.querySelector('#register-submit').addEventListener("click", (event) => 
 		body: JSON.stringify({
 			login, password
 		}),
-	}); // TODO docker compose pour que ca tourne
-})
+	});
+}
+
+document.querySelector('#form-register-submit').addEventListener("click", event => authenticationAction(event, 'register'))
+
+document.querySelector('#form-login-submit').addEventListener("click", event => authenticationAction(event, 'login'))
