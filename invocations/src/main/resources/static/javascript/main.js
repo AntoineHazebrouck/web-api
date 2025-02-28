@@ -54,6 +54,7 @@ document
 			renderAlert(
 				`User was logged in providing the following token : ${response}`
 			);
+			token = response;
 		})
 	);
 
@@ -66,6 +67,7 @@ document
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json',
+				Authorization: `Bearer ${token}`,
 			},
 			body: JSON.stringify({
 				TODOOOOOOO,
