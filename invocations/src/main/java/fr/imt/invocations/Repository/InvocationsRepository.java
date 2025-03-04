@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface InvocationsRepository extends MongoRepository<Invocations, Integer> {
 
-    Invocations findById(int ID);
+    Invocations findById(UUID ID);
 
     List<Invocations> findAllByIdMonstre(int monstre);
 

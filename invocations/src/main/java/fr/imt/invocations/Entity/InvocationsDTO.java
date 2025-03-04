@@ -2,6 +2,11 @@ package fr.imt.invocations.Entity;
 
 import jakarta.validation.constraints.Size;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
@@ -15,7 +20,7 @@ public class InvocationsDTO {
 
     private int idJoueur;
 
-    private Random rand = new Random();
+    private static Random rand = new Random();
 
     private static final NavigableMap<Integer, Integer> dropRates = new TreeMap<>();
 
@@ -53,7 +58,7 @@ public class InvocationsDTO {
 
     public void setIdJoueur(int idJoueur) { this.idJoueur = idJoueur; }
 
-    public int generateMonstre() {
+    public static int generateMonstre() {
         int randomValue = rand.nextInt(100);
 
         for (var entry : dropRates.entrySet()) {
@@ -62,6 +67,46 @@ public class InvocationsDTO {
             }
         }
         return 1; // Valeur de secours
+    }
+
+    public static int fetchExternalMonstreId() {
+        int idMonstre = generateMonstre();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://api-monstres:8080/monstres/new/" + idMonstre)) // Remplace avec ton URL
+                .header("Accept", "application/json")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return Integer.parseInt(response.body().trim());
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return 1; // Valeur de secours si l'API échoue
+    }
+
+    public static void sendMonsterToPlayer(int playerId, int monsterId) {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://api-joueur:8080/" + playerId + "/monsters/" + monsterId + "/add"))
+                .header("Accept", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.noBody()) // PATCH sans corps
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                System.out.println("✅ Monstre ajouté au joueur avec succès !");
+            } else {
+                System.err.println("❌ Erreur lors de l'ajout du monstre : " + response.statusCode());
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
