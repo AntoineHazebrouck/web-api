@@ -36,6 +36,30 @@ public class MonsterSkill {
         return this.num;
     }
 
+    public int getLevel() {
+        return this.level;
+    }
+
+    public int getDmg() {
+        return this.dmg;
+    }
+
+    public String getRatioStat() {
+        return this.ratioStat;
+    }
+
+    public double getRatioPercent() {
+        return this.ratioPercent;
+    }
+
+    public int getCooldown() {
+        return this.cooldown;
+    }
+
+    public int getLevelMax() {
+        return this.levelMax;
+    }
+
     public void gainLevel(){
         if (level < levelMax){
             level++;

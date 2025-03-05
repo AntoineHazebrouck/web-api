@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface MonsterRepository extends MongoRepository<Monster, Integer> {
 
     Monster findById(int id);
+
 }
