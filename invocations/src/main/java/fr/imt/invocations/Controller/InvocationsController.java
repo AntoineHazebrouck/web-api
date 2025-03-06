@@ -19,14 +19,14 @@ public class InvocationsController {
     private InvocationsService invocationsService;
 
     @GetMapping("/{id}")
-    public Invocations getInvocation(@PathVariable int id) {
+    public Invocations getInvocation(@PathVariable UUID id) {
         return invocationsService.getInvocationById(id);
     }
 
-    @PostMapping("/new")
-    public void createInvocation(@Valid @RequestBody InvocationsDTO invocation) {
-        invocationsService.createInvocation(invocation);
-    }
+//    @PostMapping("/new")
+//    public void createInvocation(@Valid @RequestBody InvocationsDTO invocation) {
+//        invocationsService.createInvocation(invocation);
+//    }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable int id) {
@@ -41,5 +41,10 @@ public class InvocationsController {
     @GetMapping("/joueurs/{id}")
     public List<Invocations> getJoueurById(@PathVariable int id) {
         return invocationsService.getInvocationsByIdJoueur(id);
+    }
+
+    @PostMapping("/new/{playerId}")
+    public int invoquerMonstre(@PathVariable int playerId) {
+        return invocationsService.invoquerMonstre(playerId);
     }
 }

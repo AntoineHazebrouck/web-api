@@ -17,7 +17,7 @@ public class Invocations {
 
     private int idJoueur;
 
-    private Random rand = new Random();
+    private static Random rand = new Random();
 
     private static final NavigableMap<Integer, Integer> dropRates = new TreeMap<>();
 
@@ -55,7 +55,7 @@ public class Invocations {
 
     public void setIdJoueur(int idJoueur) {this.idJoueur = idJoueur; }
 
-    public int generateMonstre() {
+    public static int generateMonstre() {
         int randomValue = rand.nextInt(100);
 
         for (var entry : dropRates.entrySet()) {

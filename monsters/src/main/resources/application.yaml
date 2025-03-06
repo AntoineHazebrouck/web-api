@@ -1,5 +1,5 @@
 spring:
-    application.name: players
+    application.name: monsters
     data:
         mongodb:
             host: mongo-database
@@ -7,5 +7,5 @@ spring:
             username: user
             password: password
             authentication-database: admin
-            database: players-database
+            database: monsters-database
             uuid-representation: standard
