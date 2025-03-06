@@ -56,6 +56,12 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.findById(id));
     }
 
+    @GetMapping("/by-login/{login}")
+    public ResponseEntity<Player> getPlayerFromLogin(@PathVariable String login, @RequestHeader String token) {
+        if (!isAuthenticated(token)) return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
+        return ResponseEntity.ok(playerService.findByLogin(login));
+    }
+
     @GetMapping("/{id}/level")
     public ResponseEntity<Integer> getLevel(@PathVariable int id, @RequestHeader String token) {
         if (!isAuthenticated(token)) return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
