@@ -17,6 +17,10 @@ public class PlayerService {
         return playerRepository.findById(id);
     }
 
+    public Player findByLogin(String login) {
+        return playerRepository.findByLogin(login);
+    }
+
     public int getPlayerLevel(int id) {
         Player player = playerRepository.findById(id);
         return player.getLevel();

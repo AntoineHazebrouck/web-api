@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface PlayerRepository extends MongoRepository<Player, Integer> {
 
     Player findById(int id);
+    Player findByLogin(String login);
 }
