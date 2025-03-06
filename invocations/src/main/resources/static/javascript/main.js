@@ -3,6 +3,12 @@ const urls = {
 	invocations: 'http://localhost:7070',
 };
 
+const renderAlert = (text) => {
+	document.querySelector(
+		'#form-alert'
+	).innerHTML = `<div class="alert alert-success" role="alert">${text}</div>`;
+};
+
 const authenticationAction = async (event, endpoint, callback) => {
 	event.preventDefault();
 
@@ -19,13 +25,54 @@ const authenticationAction = async (event, endpoint, callback) => {
 	const response = await fetch(`${urls.authentication}/${endpoint}`, {
 		method: 'POST',
 		headers: {
-			'Content-Type': 'application/json',
-			accept: 'text/plain',
+			'Content-type': 'application/json',
 		},
 		body: JSON.stringify({
 			login,
 			password,
 		}),
+	}).then((response) => response.text());
+	console.log(response);
+	callback(response);
+};
+
+document
+	.querySelector('#form-register-submit')
+	.addEventListener('click', (event) =>
+		authenticationAction(event, 'register', (response) =>
+			renderAlert(
+				`User was registered with the following login : ${response}`
+			)
+		)
+	);
+
+let token;
+document
+	.querySelector('#form-login-submit')
+	.addEventListener('click', (event) =>
+		authenticationAction(event, 'login', (response) => {
+			renderAlert(
+				`User was logged in providing the following token : ${response}`
+			);
+			token = response;
+		})
+	);
+
+document
+	.querySelector('#invocation-button')
+	.addEventListener('click', async (event) => {
+		event.preventDefault();
+
+		const response = await fetch(`${urls.invocations}/TODO`, {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+			body: JSON.stringify({
+				TODOOOOOOO,
+			}),
+		}).then((response) => response.text());
 	});
 	callback(response);
 };
