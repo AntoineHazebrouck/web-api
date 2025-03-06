@@ -73,9 +73,8 @@ document
 				TODOOOOOOO,
 			}),
 		}).then((response) => response.text());
+		callback(response);
 	});
-	callback(response);
-};
 
 document
 	.querySelector('#form-register-submit')
