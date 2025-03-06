@@ -43,7 +43,7 @@ public class InvocationsController {
         return invocationsService.getInvocationsByIdJoueur(id);
     }
 
-    @PostMapping("/invocations/{playerId}")
+    @PostMapping("/new/{playerId}")
     public int invoquerMonstre(@PathVariable int playerId) {
         return invocationsService.invoquerMonstre(playerId);
     }

@@ -46,10 +46,15 @@ public class InvocationsService {
     public int invoquerMonstre(int playerId) {
         int monstreId = getApiMonstreId();
 
-        Invocations invocation = new Invocations(UUID.randomUUID(), monstreId, playerId);
-        invocationsRepository.save(invocation);
+        if (monstreId != -1 ) {
+            Invocations invocation = new Invocations(UUID.randomUUID(), monstreId, playerId);
+            invocationsRepository.save(invocation);
 
-        sendMonstreToPlayer(playerId, monstreId);
+            sendMonstreToPlayer(playerId, monstreId);
+        } else {
+            System.err.println("❌ Erreur lors de l'invocation du monstre ");
+        }
+
         return monstreId;
     }
 
@@ -57,9 +62,9 @@ public class InvocationsService {
         int idMonstre = generateMonstre();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://api-monstres:8080/monstres/new/" + idMonstre)) // Remplace avec ton URL
+                .uri(URI.create("http://monsters-api:8080/monsters/create/" + idMonstre)) // Remplace avec ton URL
                 .header("Accept", "application/json")
-                .GET()
+                .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
         try {
@@ -70,13 +75,13 @@ public class InvocationsService {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        return 1; // Valeur de secours si l'API échoue
+        return -1; // Valeur de secours si l'API échoue
     }
 
     private void sendMonstreToPlayer(int playerId, int monstreId) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://api-joueur:8080/" + playerId + "/monsters/" + monstreId + "/add"))
+                .uri(URI.create("http://players-api:8080/players/" + playerId + "/monsters/" + monstreId + "/add"))
                 .header("Accept", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
