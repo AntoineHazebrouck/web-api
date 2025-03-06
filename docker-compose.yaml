@@ -24,5 +24,11 @@ services:
     invocations-api:
         build: ./invocations
         container_name: invocations-api
-        ports: [ '7070:7070' ]
+        ports: [ '7070:8080' ]
+        depends_on: [ 'mongo-database', 'authentication-api' ]
+
+    monsters-api:
+        build: ./monsters
+        container_name: monsters-api
+        ports: [ '6060:8080' ]
         depends_on: [ 'mongo-database', 'authentication-api' ]

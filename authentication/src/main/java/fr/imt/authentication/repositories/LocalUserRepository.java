@@ -1,5 +1,6 @@
 package fr.imt.authentication.repositories;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -28,14 +29,20 @@ class LocalUserRepository implements UserRepository {
 	}
 
 	@Override
-	public Optional<User> findByToken(String token) {
-		return users.stream()
-				.filter(user -> user.getToken().equals(token))
-				.findFirst();
+	public void deleteAll() {
+		users.clear();
 	}
 
 	@Override
-	public void deleteAll() {
-		users.clear();
+	public void deleteById(String login) {
+		users.removeIf(user -> user.getLogin().equals(login));
+	}
+
+	@Override
+	public Optional<User> findByTokenAndExpirationAfter(String token, LocalDateTime time) {
+		return users.stream()
+				.filter(user -> user.getToken().equals(token))
+				.filter(user -> user.getExpiration().isAfter(time))
+				.findFirst();
 	}
 }
