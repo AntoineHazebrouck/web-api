@@ -1,19 +1,39 @@
 const urls = {
 	authentication: 'http://localhost:8080',
 	invocations: 'http://localhost:7070',
+	players: 'http://localhost:9090',
 };
 
-const renderAlert = (text) => {
-	document.querySelector(
-		'#form-alert'
-	).innerHTML = `<div class="alert alert-success" role="alert">${text}</div>`;
+const dom = {
+	login: document.querySelector('#form-login'),
+	password: document.querySelector('#form-password'),
+	alerts: document.querySelector('#form-alert'),
+	buttons: {
+		register: document.querySelector('#form-register-submit'),
+		login: document.querySelector('#form-login-submit'),
+		invocations: document.querySelector('#invocation-button'),
+	},
 };
 
-const authenticationAction = async (event, endpoint, callback) => {
-	event.preventDefault();
+const renderAlerts = (successes, errors) => {
+	dom.alerts.innerHTML = '';
+	const alerts = errors
+		.map(
+			(text) =>
+				`<div class="alert alert-danger" role="alert">${text}</div>`
+		)
+		.concat(
+			successes.map(
+				(text) =>
+					`<div class="alert alert-success" role="alert">${text}</div>`
+			)
+		);
+	dom.alerts.innerHTML = alerts.join('');
+};
 
-	const login = document.querySelector('#form-login').value;
-	const password = document.querySelector('#form-password').value;
+const authenticationAction = async (endpoint) => {
+	const login = dom.login.value;
+	const password = dom.password.value;
 
 	console.log(
 		JSON.stringify({
@@ -22,7 +42,8 @@ const authenticationAction = async (event, endpoint, callback) => {
 		})
 	);
 
-	const response = await fetch(`${urls.authentication}/${endpoint}`, {
+	let error = false;
+	const response = await fetch(`${urls.authentication}${endpoint}`, {
 		method: 'POST',
 		headers: {
 			'Content-type': 'application/json',
@@ -31,59 +52,77 @@ const authenticationAction = async (event, endpoint, callback) => {
 			login,
 			password,
 		}),
-	}).then((response) => response.text());
+	}).then(async (response) => {
+		const content = await response.text();
+		if (!response.ok) {
+			renderAlerts([], [content, `Try to register first`]);
+			error = true;
+		}
+		return content;
+	});
 	console.log(response);
-	callback(response);
+
+	return error ? null : response;
 };
 
-document
-	.querySelector('#form-register-submit')
-	.addEventListener('click', (event) =>
-		authenticationAction(event, 'register', (response) =>
-			renderAlert(
-				`User was registered with the following login : ${response}`
-			)
-		)
-	);
+dom.buttons.register.addEventListener('click', async (event) => {
+	event.preventDefault();
+	const login = await authenticationAction('/register');
 
+	const player = await fetch(`${urls.players}/players`, {
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/json',
+		},
+		body: JSON.stringify({
+			login,
+		}),
+	}).then((response) => response.json());
+
+	renderAlerts(
+		[
+			`User was registered with the following login : ${login}`,
+			`New player was created : ${JSON.stringify(player)}`,
+		],
+		[]
+	);
+});
+
+let me;
 let token;
-document
-	.querySelector('#form-login-submit')
-	.addEventListener('click', (event) =>
-		authenticationAction(event, 'login', (response) => {
-			renderAlert(
-				`User was logged in providing the following token : ${response}`
-			);
-			token = response;
-		})
-	);
+dom.buttons.login.addEventListener('click', async (event) => {
+	event.preventDefault();
+	token = await authenticationAction('/login');
+	me = await fetch(`${urls.players}/players/by-login/${dom.login.value}`, {
+		headers: {
+			token,
+		},
+	}).then((response) => response.json());
 
-document
-	.querySelector('#invocation-button')
-	.addEventListener('click', async (event) => {
-		event.preventDefault();
+	if (token) {
+		renderAlerts(
+			[
+				`User was logged with the following token : ${token}`,
+				`Attached player is : ${JSON.stringify(me)}`,
+			],
+			[]
+		);
+	}
+});
 
-		const response = await fetch(`${urls.invocations}/TODO`, {
+dom.buttons.invocations.addEventListener('click', async (event) => {
+	event.preventDefault();
+
+	const response = await fetch(
+		`${urls.invocations}/invocations/new/${me['id']}`,
+		{
 			method: 'POST',
 			headers: {
-				'Content-type': 'application/json',
-				Authorization: `Bearer ${token}`,
+				token,
 			},
-			body: JSON.stringify({
-				TODOOOOOOO,
-			}),
-		}).then((response) => response.text());
-		callback(response);
-	});
-
-document
-	.querySelector('#form-register-submit')
-	.addEventListener('click', (event) =>
-		authenticationAction(event, 'register', async (response) =>
-			console.log(await response.json())
-		)
-	);
-
-document
-	.querySelector('#form-login-submit')
-	.addEventListener('click', (event) => authenticationAction(event, 'login'));
+		}
+	).then((response) => response.text());
+	
+	console.log(response);
+	
+});

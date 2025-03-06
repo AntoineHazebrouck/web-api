@@ -6,62 +6,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlayerService {
 
-    @Autowired
-    private PlayerRepository playerRepository;
+	@Autowired
+	private PlayerRepository playerRepository;
 
-    public Player findById(int id) {
-        return playerRepository.findById(id);
-    }
+	public Player findById(int id) {
+		return playerRepository.findById(id);
+	}
 
-    public Player findByLogin(String login) {
-        return playerRepository.findByLogin(login);
-    }
+	public Player findByLogin(String login) {
+		return playerRepository.findByLogin(login);
+	}
 
-    public int getPlayerLevel(int id) {
-        Player player = playerRepository.findById(id);
-        return player.getLevel();
-    }
+	public int getPlayerLevel(int id) {
+		Player player = playerRepository.findById(id);
+		return player.getLevel();
+	}
 
-    public Player createPlayer(Player player) {
-        return playerRepository.save(player);
-    }
+	public Player createPlayer(Player player) {
+		// workaround pour eviter la complexite des id autogénérés
+		player.setId(Optional.ofNullable(player.getId()).orElse(player.getLogin().hashCode()));
+		return playerRepository.save(player);
+	}
 
-    public List<Integer> getPlayerMonsters(int id) {
-        Player player = playerRepository.findById(id);
-        return player.getMonsters();
-    }
+	public List<Integer> getPlayerMonsters(int id) {
+		Player player = playerRepository.findById(id);
+		return player.getMonsters();
+	}
 
-    public List<Integer> addMonster(int playerId, int monsterId) {
-        Player player = findById(playerId);
-        if (player.canAddMonster() && !player.hasMonster(monsterId)) {
-            player.addMonster(monsterId);
-            playerRepository.save(player);
-        }
-        return player.getMonsters();
-    }
+	public List<Integer> addMonster(int playerId, int monsterId) {
+		Player player = findById(playerId);
+		if (player.canAddMonster() && !player.hasMonster(monsterId)) {
+			player.addMonster(monsterId);
+			playerRepository.save(player);
+		}
+		return player.getMonsters();
+	}
 
-    public List<Integer> removeMonster(int playerId, int monsterId) {
-        Player player = findById(playerId);
-        if (player.hasMonster(monsterId)) {
-            player.removeMonster(monsterId);
-            playerRepository.save(player);
-        }
-        return player.getMonsters();
-    }
+	public List<Integer> removeMonster(int playerId, int monsterId) {
+		Player player = findById(playerId);
+		if (player.hasMonster(monsterId)) {
+			player.removeMonster(monsterId);
+			playerRepository.save(player);
+		}
+		return player.getMonsters();
+	}
 
-    public Player addExperience(int playerId, int experience) {
-        Player player = findById(playerId);
-        player.addExperience(experience);
-        return playerRepository.save(player);
-    }
+	public Player addExperience(int playerId, int experience) {
+		Player player = findById(playerId);
+		player.addExperience(experience);
+		return playerRepository.save(player);
+	}
 
-    public Player gainLevel(int playerId) {
-        Player player = findById(playerId);
-        player.gainLevel();
-        return playerRepository.save(player);
-    }
+	public Player gainLevel(int playerId) {
+		Player player = findById(playerId);
+		player.gainLevel();
+		return playerRepository.save(player);
+	}
 }
