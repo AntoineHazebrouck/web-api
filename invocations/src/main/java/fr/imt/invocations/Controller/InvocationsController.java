@@ -74,8 +74,10 @@ public class InvocationsController {
     }
 
     @PostMapping("/new/{playerId}")
-    public ResponseEntity<Integer> invoquerMonstre(@PathVariable int playerId, @RequestHeader String token) {
+    public ResponseEntity<Invocations> invoquerMonstre(@PathVariable int playerId, @RequestHeader String token) {
         if (!isAuthenticated(token)) return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
-        return ResponseEntity.ok(invocationsService.invoquerMonstre(playerId));
+        return ResponseEntity.ok(
+			invocationsService.invoquerMonstre(playerId, token).orElseThrow(() -> 
+			new InternalError("Server did not manage to create the invocation on user : " + playerId)));
     }
 }

@@ -75,8 +75,9 @@ public class PlayerController {
     }
 
     @PostMapping
-    public ResponseEntity<Player> createPlayer(@RequestBody @Valid Player player, @RequestHeader String token) {
-        if (!isAuthenticated(token)) return ResponseEntity.status(HttpStatusCode.valueOf(401)).build();
+    public ResponseEntity<Player> createPlayer(@RequestBody @Valid Player player) {
+		// pas d'authentification
+		// il faut creer le player au moment ou on se register dans l'ui (donc on est pas encore login)
         return ResponseEntity.ok(playerService.createPlayer(player));
     }
 
