@@ -13,8 +13,45 @@ const dom = {
 		login: document.querySelector('#form-login-submit'),
 		invocations: document.querySelector('#invocation-button'),
 	},
+	invocations: {
+		currentId: document.querySelector('#current-invocation-id'),
+		currentMonster: document.querySelector('#current-monster'),
+	}
 };
 
+const http = {
+	post: {
+		register: async () => await authenticationAction('/register'),
+		login: async () => await authenticationAction('/login'),
+		players: async (login) =>
+			await fetch(`${urls.players}/players`, {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
+				},
+				body: JSON.stringify({
+					login,
+				}),
+			}).then((response) => response.json()),
+		invocations: async (me, token) =>
+			await fetch(`${urls.invocations}/invocations/new/${me['id']}`, {
+				method: 'POST',
+				headers: {
+					token,
+				},
+			}).then((response) => response.json()),
+	},
+	get: {
+		me: async (token) =>
+			await fetch(`${urls.players}/players/by-login/${dom.login.value}`, {
+				headers: {
+					token,
+				},
+			}).then((response) => response.json()),
+	},
+};
+
+// start utils
 const renderAlerts = (successes, errors) => {
 	dom.alerts.innerHTML = '';
 	const alerts = errors
@@ -64,20 +101,13 @@ const authenticationAction = async (endpoint) => {
 
 	return error ? null : response;
 };
+// end utils
 
+// start dom
 dom.buttons.register.addEventListener('click', async (event) => {
 	event.preventDefault();
-	const login = await authenticationAction('/register');
-
-	const player = await fetch(`${urls.players}/players`, {
-		method: 'POST',
-		headers: {
-			'Content-type': 'application/json',
-		},
-		body: JSON.stringify({
-			login,
-		}),
-	}).then((response) => response.json());
+	const login = await http.post.register();
+	const player = await http.post.players(login);
 
 	renderAlerts(
 		[
@@ -92,12 +122,8 @@ let me;
 let token;
 dom.buttons.login.addEventListener('click', async (event) => {
 	event.preventDefault();
-	token = await authenticationAction('/login');
-	me = await fetch(`${urls.players}/players/by-login/${dom.login.value}`, {
-		headers: {
-			token,
-		},
-	}).then((response) => response.json());
+	token = await http.post.login();
+	me = await http.get.me(token);
 
 	if (token) {
 		renderAlerts(
@@ -113,16 +139,13 @@ dom.buttons.login.addEventListener('click', async (event) => {
 dom.buttons.invocations.addEventListener('click', async (event) => {
 	event.preventDefault();
 
-	const response = await fetch(
-		`${urls.invocations}/invocations/new/${me['id']}`,
-		{
-			method: 'POST',
-			headers: {
-				token,
-			},
-		}
-	).then((response) => response.text());
+	const response = await http.post.invocations(me, token);
 	
+	dom.invocations.currentId.innerHTML = response['id'];
+	dom.invocations.currentMonster.innerHTML = response['idMonstre']; // TODO fetch monster
+
+	console.log(response['id']);
+	console.log(response['idMonstre']);
 	console.log(response);
-	
 });
+// end dom

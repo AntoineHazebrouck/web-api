@@ -1,19 +1,21 @@
 package fr.imt.invocations.Service;
 
-import fr.imt.invocations.Entity.Invocations;
-import fr.imt.invocations.Repository.InvocationsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static fr.imt.invocations.Entity.Invocations.generateMonstre;
 
-import java.util.List;
-import java.util.UUID;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import static fr.imt.invocations.Entity.Invocations.generateMonstre;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.imt.invocations.Entity.Invocations;
+import fr.imt.invocations.Repository.InvocationsRepository;
 
 @Service
 public class InvocationsService {
@@ -42,22 +44,21 @@ public class InvocationsService {
 		return invocationsRepository.findAllByIdJoueur(id);
 	}
 
-	public int invoquerMonstre(int playerId, String token) {
-		int monstreId = getApiMonstreId(token);
+	public Optional<Invocations> invoquerMonstre(int playerId, String token) {
+		Optional<Integer> monstreId = getApiMonstreId(token);
 
-		if (monstreId != -1) {
-			Invocations invocation = new Invocations(UUID.randomUUID(), monstreId, playerId);
-			invocationsRepository.save(invocation);
-
-			sendMonstreToPlayer(playerId, monstreId, token);
+		if (monstreId.isPresent()) {
+			Invocations invocation = new Invocations(UUID.randomUUID(), monstreId.get(), playerId);
+			Invocations added = invocationsRepository.save(invocation);
+			sendMonstreToPlayer(playerId, monstreId.get(), token);
+			return Optional.of(added);
 		} else {
 			System.err.println("❌ Erreur lors de l'invocation du monstre ");
+			return Optional.empty();
 		}
-
-		return monstreId;
 	}
 
-	public int getApiMonstreId(String token) {
+	public Optional<Integer> getApiMonstreId(String token) {
 		int idMonstre = generateMonstre();
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder()
@@ -70,12 +71,12 @@ public class InvocationsService {
 		try {
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() == 200) {
-				return Integer.parseInt(response.body().trim());
+				return Optional.of(Integer.parseInt(response.body().trim()));
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		return -1; // Valeur de secours si l'API échoue
+		return Optional.empty(); // Valeur de secours si l'API échoue
 	}
 
 	private void sendMonstreToPlayer(int playerId, int monstreId, String token) {
