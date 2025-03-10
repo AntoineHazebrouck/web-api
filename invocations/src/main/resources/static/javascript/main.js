@@ -2,6 +2,7 @@ const urls = {
 	authentication: 'http://localhost:8080',
 	invocations: 'http://localhost:7070',
 	players: 'http://localhost:9090',
+	monsters: 'http://localhost:6060',
 };
 
 const dom = {
@@ -16,7 +17,7 @@ const dom = {
 	invocations: {
 		currentId: document.querySelector('#current-invocation-id'),
 		currentMonster: document.querySelector('#current-monster'),
-	}
+	},
 };
 
 const http = {
@@ -44,6 +45,12 @@ const http = {
 	get: {
 		me: async (token) =>
 			await fetch(`${urls.players}/players/by-login/${dom.login.value}`, {
+				headers: {
+					token,
+				},
+			}).then((response) => response.json()),
+		monster: async (id, token) =>
+			await fetch(`${urls.monsters}/monsters/${id}`, {
 				headers: {
 					token,
 				},
@@ -139,13 +146,42 @@ dom.buttons.login.addEventListener('click', async (event) => {
 dom.buttons.invocations.addEventListener('click', async (event) => {
 	event.preventDefault();
 
-	const response = await http.post.invocations(me, token);
-	
-	dom.invocations.currentId.innerHTML = response['id'];
-	dom.invocations.currentMonster.innerHTML = response['idMonstre']; // TODO fetch monster
+	const invocation = await http.post.invocations(me, token);
+	console.log(invocation);
 
-	console.log(response['id']);
-	console.log(response['idMonstre']);
-	console.log(response);
+	dom.invocations.currentId.innerHTML = `Invocation number : ${invocation['id']}`;
+
+	const monster = await http.get.monster(invocation['idMonstre'], token);
+	console.log(monster);
+
+	const properties = Object.entries(monster)
+		.filter(([key, value]) => key !== 'skills')
+		.map(
+			([key, value]) =>
+				`<li class="list-group-item">${key} : ${value}</li>`
+		)
+		.join('');
+
+	const skills = `
+	<li class="list-group-item">
+		skills : 
+		${monster['skills']
+			.map(
+				(skill) =>
+					`<ul id="current-monster" class="list-group">${Object.entries(
+						skill
+					)
+						.map(
+							([key, value]) =>
+								`<li class="list-group-item">${key} : ${value}</li>`
+						)
+						.join('')}
+					</ul>
+				`
+			)
+			.join('<hr>')}
+	</li>`;
+
+	dom.invocations.currentMonster.innerHTML = properties + skills;
 });
 // end dom
