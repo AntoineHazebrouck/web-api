@@ -1,9 +1,10 @@
 # This compose is to test between authentication-api and mongo only
 version: '3.3'
 services:
-    mongo-database:
+    test-mongo-database:
         ports: ['27017:27017']
-        container_name: mongo-database
+        container_name: test-mongo-database
+        hostname: mongo-database
         restart: on-failure
         environment:
             - MONGO_INITDB_ROOT_USERNAME=user
@@ -14,4 +15,4 @@ services:
             context: .
             dockerfile: test.dockerfile
         container_name: test-authentication-api
-        depends_on: ['mongo-database']
+        depends_on: ['test-mongo-database']
