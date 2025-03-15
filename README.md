@@ -1,3 +1,10 @@
+### Groupe :
+
+- Antoine HAZEBROUCK
+- Lucas DUBUSSE
+- Maxime SONTAG
+- Milan DELZENNE
+
 # Start the servers pool
 
 ```shell
